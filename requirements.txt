@@ -1,0 +1,10 @@
+Flask==2.0.1
+requests>=2.31.0
+yfinance==0.2.36
+plotly==5.18.0
+pandas==2.0.3
+python-dotenv==1.0.0
+transformers==4.36.2
+torch==2.1.2
+accelerate==0.26.1
+huggingface_hub>=0.20.3 

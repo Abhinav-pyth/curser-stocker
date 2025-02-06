@@ -1,0 +1,12 @@
+Flask==2.0.1
+requests>=2.31.0
+yfinance==0.2.36
+plotly==5.18.0
+pandas==2.0.3
+python-dotenv==1.0.0
+huggingface_hub>=0.20.3
+gunicorn==21.2.0
+Werkzeug==2.0.3
+Flask-Compress==1.14
+Flask-Caching==2.1.0
+Flask-Talisman==1.1.0 
