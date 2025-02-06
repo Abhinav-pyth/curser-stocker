@@ -29,11 +29,16 @@ Talisman(app, content_security_policy=None)
 
 # Initialize Hugging Face Inference Client
 try:
-    client = InferenceClient(
-        provider="together",
-        api_key=os.environ["HUGGINGFACE_API_KEY"]
-    )
-    print("Hugging Face Inference Client initialized successfully")
+    huggingface_api_key = os.environ.get('HUGGINGFACE_API_KEY')
+    if huggingface_api_key:
+        client = InferenceClient(
+            provider="together",
+            api_key=huggingface_api_key
+        )
+        print("Hugging Face Inference Client initialized successfully")
+    else:
+        print("HUGGINGFACE_API_KEY not found in environment variables")
+        client = None
 except Exception as e:
     print(f"Error initializing Inference Client: {str(e)}")
     client = None

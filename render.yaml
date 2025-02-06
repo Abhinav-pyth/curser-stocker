@@ -3,14 +3,17 @@ services:
     name: curser-stocker
     env: python
     buildCommand: pip install -r requirements-prod.txt
-    startCommand: gunicorn wsgi:application --workers 4 --threads 2 --timeout 60 --worker-class gthread
+    startCommand: gunicorn wsgi:application
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.12
+        value: 3.11.0
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
         generateValue: true
       - key: HUGGINGFACE_API_KEY
         sync: false
+      - key: WEB_CONCURRENCY
+        value: 2
+    healthCheckPath: /
     autoDeploy: true 
