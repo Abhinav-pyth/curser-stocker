@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ stock_data.company_name }} - Stock Analysis</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+        
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .price-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .current-price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--success-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .price-change {
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+        
+        .price-change.positive {
+            color: var(--success-color);
+        }
+        
+        .price-change.negative {
+            color: var(--danger-color);
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metrics-table th {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .metrics-table td {
+            font-size: 1.1em;
+        }
+        
+        .news-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .news-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-date {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .news-source {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        
+        .ai-analysis {
+            font-size: 1.1em;
+            line-height: 1.8;
+            padding: 20px;
+        }
+        
+        .ai-analysis h3 {
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .ai-analysis ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .ai-analysis li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .ai-analysis li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.5em;
+            position: absolute;
+            left: 0;
+            top: -5px;
+        }
+        
+        .target-price {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        
+        .stop-loss {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .trend-indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .trend-bullish {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .trend-bearish {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .trend-neutral {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            z-index: 1000;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .current-price {
+                font-size: 2em;
+            }
+            
+            .chart-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card price-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h1 class="mb-3">{{ stock_data.company_name }}</h1>
+                                <div class="current-price">
+                                    {{ stock_data.current_price }}
+                                    <span class="price-change positive">
+                                        <i class="fas fa-arrow-up"></i> 2.5%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="trend-indicator trend-bullish">
+                                    <i class="fas fa-chart-line"></i> Bullish
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Price Chart -->
+                <div class="card chart-container">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-chart-candlestick"></i> Price Chart with 200 DMA</h4>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-light">1M</button>
+                            <button class="btn btn-sm btn-outline-light active">1Y</button>
+                            <button class="btn btn-sm btn-outline-light">5Y</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="candlestick-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Volume Chart -->
+                <div class="card chart-container">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-chart-bar"></i> Trading Volume</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="volume-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Financial Metrics -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-calculator"></i> Key Financial Metrics</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover metrics-table">
+                            <tbody>
+                                {% for key, value in stock_data.financials.items() %}
+                                <tr>
+                                    <th>{{ key }}</th>
+                                    <td class="text-right">{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- News Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-newspaper"></i> Recent News</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if stock_data.news %}
+                            {% for item in stock_data.news %}
+                            <div class="news-item">
+                                <h5 class="mb-2">
+                                    <a href="{{ item.link }}" target="_blank" class="text-dark">{{ item.title }}</a>
+                                </h5>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="news-source">{{ item.publisher }}</span>
+                                    <span class="news-date">{{ item.published }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="p-3 mb-0">No recent news available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-robot"></i> AI Analysis & Prediction</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="ai-analysis">
+                            {{ prediction | replace('\n', '<br>') | replace('•', '&bull;') | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Back Button -->
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Analyze Another Stock
+    </a>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <!-- Chart Initialization -->
+    <script>
+        var candlestickData = {{ stock_data.candlestick | safe }};
+        var volumeData = {{ stock_data.volume | safe }};
+        
+        // Customize chart themes
+        candlestickData.layout.template = 'plotly_dark';
+        candlestickData.layout.paper_bgcolor = 'rgba(0,0,0,0)';
+        candlestickData.layout.plot_bgcolor = 'rgba(0,0,0,0)';
+        candlestickData.layout.font = { color: '#2c3e50' };
+        
+        volumeData.layout.template = 'plotly_dark';
+        volumeData.layout.paper_bgcolor = 'rgba(0,0,0,0)';
+        volumeData.layout.plot_bgcolor = 'rgba(0,0,0,0)';
+        volumeData.layout.font = { color: '#2c3e50' };
+        
+        Plotly.newPlot('candlestick-chart', candlestickData.data, candlestickData.layout);
+        Plotly.newPlot('volume-chart', volumeData.data, volumeData.layout);
+    </script>
+</body>
+</html> 

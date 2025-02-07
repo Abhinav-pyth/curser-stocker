@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Indian Stock Market Analyzer</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .features-list {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .feature-item {
+            margin-bottom: 15px;
+        }
+        .hero-section {
+            background: linear-gradient(to right, #FF9933, #FFFFFF, #138808);
+            color: #000;
+            padding: 50px 0;
+            margin-bottom: 40px;
+        }
+        .example-symbols {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="text-center">Indian Stock Market Analyzer</h1>
+            <p class="text-center lead">Get comprehensive NSE stock analysis with AI-powered predictions and real-time market data</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Search Form -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form method="POST" action="/" class="mb-4">
+                    <div class="form-group">
+                        <label for="stock"><strong>Enter NSE Stock Symbol:</strong></label>
+                        <input type="text" class="form-control form-control-lg" id="stock" name="stock" 
+                               placeholder="e.g., RELIANCE, TCS, INFY" required>
+                        <small class="form-text text-muted">Enter the stock symbol without .NS suffix</small>
+                        <div class="example-symbols mt-2">
+                            Popular symbols: HDFCBANK, TATAMOTORS, WIPRO, ITC, SBIN
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Analyze Stock</button>
+                </form>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="alert alert-warning" role="alert">
+                            {% for message in messages %}
+                                <p class="mb-0">{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-list">
+            <h3 class="text-center mb-4">Advanced Analysis Features</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>📈 Technical Analysis</h5>
+                        <p>View candlestick patterns, 200 DMA, and volume analysis with color-coded indicators</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>📊 Financial Metrics</h5>
+                        <p>Track key metrics including market cap, P/E ratio, and dividend yield in INR</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>📰 Latest Updates</h5>
+                        <p>Get real-time news, market analysis, and AI-powered predictions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html> 
